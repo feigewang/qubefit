@@ -93,8 +93,12 @@ def ThinDisk(**kwargs):
                         kwargs['par']['Vmax'])
         # note that VMap is based on the "sky angle" (Phi)
         VMap = __get_centralvelocity__(PhiPrime, VDep, **kwargs)
-        DMap = (eval('_' + kwargs['mstring']['dispersionprofile'][0] + '_')
-                (R, kwargs['par']['Rv']) * kwargs['par']['Disp'])
+        if 'DIdx' in kwargs['par'].keys():
+            DMap = (eval('_' + kwargs['mstring']['dispersionprofile'][0] + '_')
+                    (RPrime, kwargs['par']['Rsig'], kwargs['par']['DIdx']) * kwargs['par']['Disp'])
+        else:
+            DMap = (eval('_' + kwargs['mstring']['dispersionprofile'][0] + '_')
+                    (RPrime, kwargs['par']['Rv']) * kwargs['par']['Disp'])
 
         # convert these maps into 3d arrays
         ICube = np.tile(IMap, (kwargs['shape'][-3], 1, 1))
@@ -771,6 +775,37 @@ def _ExpConst_(X, X0, *args):
 def _Custom_(X, X0, *args):
 
     return (np.power((X / X0), -0.5) * 0.3888 + 1.)
+
+def _ExponentialV_(X, X0):
+    '''
+    function for velocity used in Kimball et al. 2015
+    https://ui.adsabs.harvard.edu/abs/2015MNRAS.452...88K
+    '''
+
+    return 1-np.exp(-1 * X / X0)
+
+def _Tanh_(X, X0):
+    '''
+    function for velocity
+    the hyperbolic tangent function (Andersen et al. 2001)
+    '''
+
+    return np.tanh(X / X0)
+
+def _ExponentialD_(X, X0, N):
+    '''
+    function for velocity dispersion used in Rizzo et al. 2018
+    '''
+
+    return np.exp(-1 * X / X0) + N
+
+def _LinearD_(X, X0, N):
+    '''
+    function for velocity dispersion used in Rizzo et al. 2018
+    '''
+
+    return 1 + N * X
+
 ##############################################################
 
 

@@ -14,6 +14,7 @@ from skimage import measure
 from qubefit.qube import Qube
 from qubefit.qfmodels import *
 from multiprocessing import Pool
+from multiprocessing import get_context
 import os
 import h5py
 
@@ -342,7 +343,10 @@ class QubeFit(Qube):
 
         # define the sampler
         os.environ["OMP_NUM_THREADS"] = "1"
-        with Pool(nproc) as pool:
+        # ToDo: not sure why the following does not work on MacOS Big Sur.
+        #       I have to declare that I want the "fork" start method when creating the pool
+        # with Pool(nproc) as pool:
+        with get_context("fork").Pool(nproc) as pool:
             sampler = emcee.EnsembleSampler(nwalkers, self.mcmcdim,
                                             __lnprob__, pool=pool,
                                             backend=backend, kwargs=kwargs)
