@@ -193,8 +193,14 @@ def DispersionBulge(**kwargs):
     else:
         IMap = (eval('_' + kwargs['mstring']['intensityprofile'][0] + '_')
                 (RPrime, kwargs['par']['Rd']) * kwargs['par']['I0'])
-        DMap = (eval('_' + kwargs['mstring']['dispersionprofile'][0] + '_')
-                (RPrime, kwargs['par']['Rv']) * kwargs['par']['Disp'])
+        #DMap = (eval('_' + kwargs['mstring']['dispersionprofile'][0] + '_')
+        #        (RPrime, kwargs['par']['Rv']) * kwargs['par']['Disp'])
+        if 'DIdx' in kwargs['par'].keys():
+            DMap = (eval('_' + kwargs['mstring']['dispersionprofile'][0] + '_')
+                    (RPrime, kwargs['par']['Rsig'], kwargs['par']['DIdx']) * kwargs['par']['Disp'])
+        else:
+            DMap = (eval('_' + kwargs['mstring']['dispersionprofile'][0] + '_')
+                    (RPrime, kwargs['par']['Rv']) * kwargs['par']['Disp'])
 
     # convert these maps into 3d matrices
     ICube = np.tile(IMap, (kwargs['shape'][-3], 1, 1))
