@@ -36,7 +36,7 @@ def velocity_curve(Mom1, PA, Incl, Center, vshift=0, scale=1.,
 
     # get the velocities
     Vsqrt = np.sqrt(1 + np.sin(Phi - PA)**2 * np.tan(Incl)**2)
-    Vmax = (Mom1.data - vshift) / (np.cos(Phi - PA) * np.sin(Incl)) * Vsqrt
+    Vmax = np.abs((Mom1.data - vshift) / (np.cos(Phi - PA) * np.sin(Incl)) * Vsqrt)
 
     # mask region near minor axis
     MinorAxisDist = np.abs(np.sin(Phi - PA + np.pi / 2))
@@ -110,7 +110,7 @@ def velocity_profile(qube, PA, Incl, Center, vshift=0, scale=1.,
     Vcube = np.tile(qube.get_velocity()[:, np.newaxis, np.newaxis] - vshift,
                     (1, qube.shape[-2], qube.shape[-1]))
     Vsqrt = np.sqrt(1 + np.sin(Phi - PA)**2 * np.tan(Incl)**2)
-    Vmax = Vcube / (np.cos(Phi - PA) * np.sin(Incl)) * Vsqrt
+    Vmax = np.abs(Vcube / (np.cos(Phi - PA) * np.sin(Incl)) * Vsqrt)
 
     # mask region near minor axis
     MinorAxisDist = np.abs(np.sin(Phi - PA + np.pi / 2))
