@@ -14,6 +14,7 @@ import astropy.units as u
 from astropy.convolution import convolve
 import copy
 
+from astropy import constants
 
 def ThinDisk(**kwargs):
     """
@@ -91,6 +92,10 @@ def ThinDisk(**kwargs):
                 VDep = (eval('_' + kwargs['mstring']['velocityprofile'][0] +
                              '_')(R, kwargs['par']['Rv']) *
                         kwargs['par']['Vmax'])
+        if 'MBH' in kwargs['par'].keys():
+            VKep = (eval('_Kepler_')(R*kwargs['initpar']['Rd']['Conversion'].value, kwargs['par']['MBH']))
+            VDep += VKep / kwargs['initpar']['Vmax']['Conversion'].value
+
         # note that VMap is based on the "sky angle" (Phi)
         VMap = __get_centralvelocity__(PhiPrime, VDep, **kwargs)
         if 'DIdx' in kwargs['par'].keys():
@@ -811,6 +816,18 @@ def _LinearD_(X, X0, N):
     '''
 
     return 1 + N * X
+
+def _Kepler_(X,X0):
+    '''
+    function for Keplerian velocity curve of a given black hole
+    X0 here is MBH in units of M_sun
+    '''
+    Mbh = X0 * u.Msun
+    r = X * u.kpc
+    v = np.sqrt(constants.G * Mbh / r).to('km/s').value
+    v[np.isinf(v)] = np.max(v[np.invert(np.isinf(v))])
+    return  v
+
 
 ##############################################################
 
